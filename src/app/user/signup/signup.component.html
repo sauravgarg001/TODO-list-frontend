@@ -1,0 +1,70 @@
+<!-- .container starts -->
+<div class="container">
+    <!-- .row starts -->
+    <div class="row mt-3">
+        <div class="col-lg-6 col-md-8 offset-md-2 offset-lg-3">
+            <form class="needs-validation border-primary p-4" style="border: 7px solid white;" novalidate>
+                <!-- .form-row starts -->
+                <div class="form-row">
+                    <div class="col-md-12">
+                        <span style="font-size: 1.5rem;">Sign Up</span>
+                    </div>
+                </div>
+                <!-- .form-row ends -->
+                <!-- .form-row starts -->
+                <div class="form-row mt-3">
+                    <div class="col-md-6 mb-3">
+                        <label for="firstName" class="font-weight-bold">First name</label>
+                        <input type="text" class="form-control" id="firstName" placeholder="First name" required>
+                        <div class="invalid-feedback" id="firstName_feedback">
+                            Enter your first name?
+                        </div>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label for="lastName" class="font-weight-bold">Last name</label>
+                        <input type="text" class="form-control" id="lastName" placeholder="Last name" required>
+                        <div class="invalid-feedback" id="lastName_feedback">
+                            Enter your last name?
+                        </div>
+                    </div>
+                </div>
+                <!-- .form-row ends -->
+                <!-- .form-row starts -->
+                <div class="form-row">
+                    <div class="col-md-12 mb-3">
+                        <label for="email" class="font-weight-bold">Email</label>
+                        <input type="text" class="form-control" id="email" placeholder="Email" required>
+                        <div class="invalid-feedback" id="email_feedback">
+                        </div>
+                    </div>
+                </div>
+                <!-- .form-row ends -->
+                <!-- .form-row starts -->
+                <div class="form-row">
+                    <div class="col-md-12 mb-3">
+                        <label for="mobileno" class="font-weight-bold">Mobile number</label>
+                        <input type="text" class="form-control" id="mobileno" placeholder="Mobile number" required>
+                        <div class="invalid-feedback" id="mobileno_feedback">
+                        </div>
+                    </div>
+                </div>
+                <!-- .form-row ends -->
+                <!-- .form-row starts -->
+                <div class="form-row">
+                    <div class="col-md-12 mb-3">
+                        <label for="password" class="font-weight-bold">Password</label>
+                        <input type="password" class="form-control" id="password" placeholder="Password" required>
+                        <div class="invalid-feedback" id="password_feedback">
+                        </div>
+                    </div>
+                </div>
+                <!-- .form-row ends -->
+                <button class="btn btn-primary form-control mt-3" type="button" id="signup">Sign Up</button>
+                <a class="btn btn-danger form-control mt-3 mb-5" [routerLink]="['/login']">Back to Login Page</a>
+            </form>
+
+        </div>
+    </div>
+    <!-- .row ends -->
+</div>
+<!-- .container ends -->

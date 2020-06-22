@@ -1,0 +1,63 @@
+<!-- .container starts -->
+<div class="container">
+    <!-- .row starts -->
+    <div class="row mt-5">
+        <div class="col-lg-6 col-md-8 offset-md-2 offset-lg-3">
+            <!-- form starts -->
+            <form class="needs-validation border-primary p-4" style="border: 7px solid white;" novalidate>
+                <!-- .form-row starts -->
+                <div class="form-row">
+                    <div class="col-md-12">
+                        <span style="font-size: 1.5rem;">Login</span>
+                    </div>
+                </div>
+                <!-- .form-row ends -->
+                <!-- .form-row starts -->
+                <div class="form-row mt-3">
+                    <div class="col-md-12 mb-3">
+                        <label for="email" class="font-weight-bold">Email</label>
+                        <input type="text" class="form-control" id="email" placeholder="Email" required>
+                        <div class="invalid-tooltip">
+                            Enter your email?
+                        </div>
+                    </div>
+                </div>
+                <!-- .form-row ends -->
+                <!-- .form-row starts -->
+                <div class="form-row">
+                    <div class="col-md-12 mb-3">
+                        <div class="form-row">
+                            <div class="col-md-6">
+                                <label for="password" class="font-weight-bold">Password</label>
+                            </div>
+                            <div class="col-md-6 form-inline" style="justify-content: flex-end;">
+                                <button class="btn btn-link" id="forgot-password" type="button">Forgot Password</button>
+                            </div>
+                        </div>
+                        <input type="password" class="form-control" id="password" placeholder="Password" required>
+                        <div class="invalid-tooltip">
+                            Enter your password?
+                        </div>
+                    </div>
+                </div>
+                <!-- .form-row ends -->
+                <button class="btn btn-danger form-control mt-5" type="button" id="login">Login</button>
+                <div class="form-row mt-5">
+                    <div class="col-md-4">
+                        <hr>
+                    </div>
+                    <div class="col-md-4 text-center">
+                        What new?
+                    </div>
+                    <div class="col-md-4">
+                        <hr>
+                    </div>
+                </div>
+                <a class="btn btn-primary form-control mt-5" [routerLink]="['/signup']">Sign Up</a>
+            </form>
+            <!-- form ends -->
+        </div>
+    </div>
+    <!-- .row ends -->
+</div>
+<!-- .container ends -->

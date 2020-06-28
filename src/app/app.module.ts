@@ -1,11 +1,13 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import { RouterModule } from '@angular/router';
+import { HttpClientModule } from '@angular/common/http';
 
 import { AppComponent } from './app.component';
 import { UserModule } from './user/user.module';
 import { ListModule } from './list/list.module';
 import { LoginComponent } from './user/login/login.component';
+import { AppService } from './app.service';
 
 @NgModule({
   declarations: [
@@ -20,9 +22,10 @@ import { LoginComponent } from './user/login/login.component';
       { path: '', redirectTo: 'login', pathMatch: 'full' },
       { path: '*', redirectTo: 'login' },
       { path: '**', redirectTo: 'login' }
-    ])
+    ]),
+    HttpClientModule
   ],
-  providers: [],
+  providers: [AppService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

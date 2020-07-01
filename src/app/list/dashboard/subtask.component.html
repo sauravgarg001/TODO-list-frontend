@@ -1,0 +1,17 @@
+<div class="list-group" *ngIf="tasks">
+    <div class="list-group-item list-group-item-action" *ngFor="let task of tasks | search:search; let i = index" [attr.data-index]="i">
+        <span (click)="toggleTaskStatus($event,taskCounter+i)" [ngClass]="{isOpen:task.isOpen,isDone:!task.isOpen}">
+            <fa-icon [icon]="faSquare" class="mr-2 open"></fa-icon>
+            <fa-icon [icon]="faCheckSquare" class="mr-2 done"></fa-icon>
+            <span class="text">{{task.text}}</span>
+        </span>
+        <fa-icon [icon]="faTimes" class="text-danger float-right" (click)="removeTask($event,taskCounter+i)"></fa-icon>
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Enter sub task" #ref>
+            <div class="input-group-append">
+                <span class="input-group-text" (click)="addSubTask($event,taskCounter+i,ref)"><fa-icon [icon]="faPlus"></fa-icon></span>
+            </div>
+        </div>
+        <subtask *ngIf="task.subTasks" [search]="search " [list]="list " [taskCounter]="taskCounter+i+ '.' " [tasks]="task.subTasks "></subtask>
+    </div>
+</div>

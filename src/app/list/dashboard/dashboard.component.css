@@ -1,0 +1,23 @@
+.isOpen>.open {
+    display: unset;
+}
+
+.isOpen>.done {
+    display: none;
+}
+
+.isOpen>.text {
+    text-decoration: none !important;
+}
+
+.isDone>.open {
+    display: none;
+}
+
+.isDone>.done {
+    display: unset;
+}
+
+.isDone>.text {
+    text-decoration: line-through !important;
+}

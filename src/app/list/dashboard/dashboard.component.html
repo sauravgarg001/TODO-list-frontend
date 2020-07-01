@@ -1,1 +1,39 @@
-<p>dashboard works!</p>
+<div class="container">
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4 text-center">
+                <span *ngIf="list">{{list.name}}</span>
+                <span *ngIf="!list">TODO List</span>
+            </h1>
+            <div class="dropdown">
+                <button class="btn btn-primary dropdown-toggle btn-block" type="button" id="dropdownMenuLists" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  Lists
+                </button>
+                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLists">
+                    <button class="dropdown-item" type="button" *ngFor="let list of lists" (click)="selectList(list.listId)" [ngClass]="{active:list.isActive}">{{list.name}} <fa-icon [icon]="faTimes" class="text-danger float-right" (click)="deleteList(list.listId)"></fa-icon></button>
+                    <div class="input-group">
+                        <input type="text" class="form-control" #newListName>
+                        <div class="input-group-append">
+                            <button type="button" class="form-control btn-block btn-secondary input-group-text" (click)="createList(newListName)">Create new List</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="form-row mb-3 mt-5" *ngIf="list">
+                <div class="col-md-10">
+                    <input type="search" name="search" class="form-control form-control-sm" [(ngModel)]="search" placeholder="Search">
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="form-control form-control-sm btn-block btn-dark btn-sm" (click)="addTask()">
+                        <fa-icon [icon]="faPlus" class="mr-2"></fa-icon>Add new Task
+                    </button>
+                </div>
+            </div>
+            <div class="form-row" *ngIf="list">
+                <div class="col" id="todo-list">
+                    <subtask [search]="search" [taskCounter]="''" [list]="list" [tasks]="list.tasks"></subtask>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

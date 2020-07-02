@@ -6,6 +6,7 @@ import { FormsModule } from '@angular/forms';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { SubtaskComponent } from './dashboard/subTask.component';
 import { SearchPipe } from './dashboard/search.pipe';
+import { ListService } from './list.service';
 
 
 
@@ -18,6 +19,7 @@ import { SearchPipe } from './dashboard/search.pipe';
     ]),
     FormsModule,
     FontAwesomeModule
-  ]
+  ],
+  providers: [ListService],
 })
 export class ListModule { }

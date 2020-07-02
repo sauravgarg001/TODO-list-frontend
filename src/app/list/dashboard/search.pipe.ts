@@ -15,8 +15,6 @@ export class SearchPipe implements PipeTransform {
         if (!tasks)
             return false;
         for (let task of tasks) {
-            console.log(task.text);
-
             if (task.text.indexOf(filter) != -1 || this.checkSubtasks(task.subTasks, filter))
                 return true;
         }

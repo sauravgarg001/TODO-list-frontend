@@ -4,6 +4,7 @@ import { AppService } from 'src/app/app.service';
 import { Router } from '@angular/router';
 import { faCheckSquare, faSquare, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { SocketService } from 'src/app/socket.service';
+import { ListService } from '../list.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -21,24 +22,10 @@ export class DashboardComponent implements OnInit {
   private authToken: string;
   private userId: string;
   public search: string;
-  public lists = [
-    {
-      listId: 'sgdf213',
-      name: 'First 1',
-      isActive: false,
-      tasks: [
-        { text: 'task1', subTasks: [{ text: 'task1.1', subTasks: [], isOpen: true }], isOpen: true },
-        { text: 'task2', subTasks: [{ text: 'task2.1', subTasks: [], isOpen: false }, { text: 'task2.2', subTasks: [], isOpen: true }], isOpen: true },
-        { text: 'task3', subTasks: [], isOpen: true },
-      ],
-      contributers: [
-
-      ]
-    }
-  ];
+  public lists;
   public list;
 
-  constructor(public appService: AppService, public sockerService: SocketService, public router: Router) { }
+  constructor(public appService: AppService, public listService: ListService, public sockerService: SocketService, public router: Router) { }
 
   ngOnInit(): void {
     this.authToken = Cookie.get('authToken');
@@ -47,55 +34,132 @@ export class DashboardComponent implements OnInit {
       this.router.navigate(['/login']);
     else {
       //verify user
+      this.listService.getLists().subscribe(
+        (apiResponse) => {
+          console.log(apiResponse);
+          if (apiResponse.status === 200) {
+            this.lists = apiResponse.data;
+            if (!this.lists)
+              return;
+            for (let list of this.lists) {
+              if (list.isActive) {
+                this.selectList(list.listId);
+                break;
+              }
+            }
+          }
+          else {
+            alert(apiResponse.message);
+          }
+        },
+        (err) => {
+          alert(err.error.message);
+        });
     }
   }
 
   public createList(listName) {
-    let name = listName.value
-    listName.value = '';
-    this.lists.push({
-      listId: 'gfhy#4fd',
-      name: name,
-      isActive: false,
-      tasks: [
-        { text: 'task1', subTasks: [{ text: 'task1.1', subTasks: [], isOpen: true }], isOpen: true },
-        { text: 'task2', subTasks: [{ text: 'task2.1', subTasks: [], isOpen: false }, { text: 'task2.2', subTasks: [], isOpen: true }], isOpen: true },
-        { text: 'task3', subTasks: [], isOpen: true },
-      ],
-      contributers: [
+    if (!listName.value) {
+      alert('Enter required fields!');
+      return;
+    }
+    let data = {
+      name: listName.value
+    }
+    this.listService.createList(data).subscribe(
+      (apiResponse) => {
+        console.log(apiResponse);
+        if (apiResponse.status === 200) {
+          let list = apiResponse.data;
+          if (!this.lists)
+            this.lists = Array();
+          this.lists.push(list);
+          listName.value = '';
+        }
+        else {
+          alert(apiResponse.message);
+        }
+      },
+      (err) => {
+        alert(err.error.message);
+      });
+  }
 
-      ]
-    });
+  public deleteList(event: MouseEvent, listId) {
+    event.stopPropagation();
+    let data = {
+      listId: listId
+    }
+    this.listService.removeList(data).subscribe(
+      (apiResponse) => {
+        console.log(apiResponse);
+        if (apiResponse.status === 200) {
+          let index = -1;
+          for (let i = 0; i < this.lists.length; i++) {
+            if (this.lists[i].listId == listId) {
+              index = i;
+              break;
+            }
+          }
+          this.lists.splice(index, 1);
+          if (this.list && this.list.listId == listId)
+            this.list = undefined;
+        }
+        else {
+          alert(apiResponse.message);
+        }
+      },
+      (err) => {
+        alert(err.error.message);
+      });
   }
 
   public selectList(listId) {
-    for (let i = 0; i < this.lists.length; i++) {
-      if (this.lists[i].listId == listId) {
-        this.lists[i].isActive = true;
-        this.list = this.lists[i];
-      } else if (this.lists[i].isActive) {
-        this.lists[i].isActive = false;
-      }
+    let data = {
+      listId: listId,
     }
+    this.listService.markListAsActive(data).subscribe(
+      (apiResponse) => {
+        console.log(apiResponse);
+        this.list = apiResponse.data;
+        if (apiResponse.status === 200) {
+          for (let i = 0; i < this.lists.length; i++) {
+            if (this.lists[i].listId == listId) {
+              this.lists[i].isActive = true;
+            } else if (this.lists[i].isActive) {
+              this.lists[i].isActive = false;
+            }
+          }
+        }
+        else {
+          alert(apiResponse.message);
+        }
+      },
+      (err) => {
+        alert(err.error.message);
+      });
   }
 
   public addTask() {
-    let task = { text: this.search, subTasks: [], isOpen: true, createdOn: Date.now(), modifiedOn: Date.now() }
-    this.list.tasks.push(task);
-    this.search = '';
-  }
-
-  public deleteList(listId) {
-    let index = -1;
-    for (let i = 0; i < this.lists.length; i++) {
-      if (this.lists[i].listId == listId) {
-        index = i;
-        break;
-      }
+    let data = {
+      text: this.search,
+      listId: this.list.listId,
+      index: -1
     }
-    this.lists.splice(index, 1);
-    if (this.list.listId == listId)
-      this.list = undefined;
+    this.listService.addTask(data).subscribe(
+      (apiResponse) => {
+        console.log(apiResponse);
+        if (apiResponse.status === 200) {
+          this.list.tasks.push({ text: data.text, subTasks: [], isOpen: true, createdOn: Date.now(), modifiedOn: Date.now() });
+          this.search = '';
+        }
+        else {
+          alert(apiResponse.message);
+        }
+      },
+      (err) => {
+        alert(err.error.message);
+      });
   }
 
 

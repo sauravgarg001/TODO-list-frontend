@@ -3,6 +3,8 @@ import { Cookie } from 'ng2-cookies/ng2-cookies';
 import { AppService } from 'src/app/app.service';
 import { Router } from '@angular/router';
 import { faCheckSquare, faSquare, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { ListService } from '../list.service';
+import { SocketService } from 'src/app/socket.service';
 
 @Component({
   selector: 'subtask',
@@ -21,9 +23,13 @@ export class SubtaskComponent {
   public faTimes = faTimes;
   public faPlus = faPlus;
 
-  constructor(public appService: AppService, public router: Router) { }
+  constructor(public appService: AppService, public listService: ListService, public sockerService: SocketService, public router: Router) { }
 
   public toggleTaskStatus(event, taskNumber: string) {
+    if (this.search) {
+      alert("Clear search first!");
+      return;
+    }
     event.stopPropagation();
     let tempTaskNumber = taskNumber;
     let tasks = this.list.tasks;
@@ -37,51 +43,108 @@ export class SubtaskComponent {
     task = tasks[parseInt(tempTaskNumber)];
 
     if (task.isOpen) {
-      task.isOpen = false;
+      let data = {
+        listId: this.list.listId,
+        index: taskNumber
+      }
+      this.listService.markTaskAsDone(data).subscribe(
+        (apiResponse) => {
+          console.log(apiResponse);
+          if (apiResponse.status === 200) {
+            task.isOpen = false;
+          }
+          else {
+            alert(apiResponse.message);
+          }
+        },
+        (err) => {
+          alert(err.error.message);
+        });
     } else {
-      task.isOpen = true;
+      let data = {
+        listId: this.list.listId,
+        index: taskNumber
+      }
+      this.listService.markTaskAsOpen(data).subscribe(
+        (apiResponse) => {
+          console.log(apiResponse);
+          if (apiResponse.status === 200) {
+            task.isOpen = true;
+          }
+          else {
+            alert(apiResponse.message);
+          }
+        },
+        (err) => {
+          alert(err.error.message);
+        });
     }
   }
-
-
-  public selectTaskForAddingSubtask(event, taskNumber: string) {
-    // let element = event.target.parentNode.parentElement;
-    // let parentID = ('' + element.id);
-    // this.selectedTask = parentID;
-  }
-
 
   public removeTask(event, taskNumber: string) {
     event.stopPropagation();
-    let tempTaskNumber = taskNumber;
-    let tasks = this.list.tasks;
-    let task;
-
-    while (tempTaskNumber.indexOf('.') != -1) {
-      task = tasks[parseInt(tempTaskNumber.substring(0, tempTaskNumber.indexOf('.')))];
-      tasks = task.subTasks;
-      tempTaskNumber = tempTaskNumber.substring(tempTaskNumber.indexOf('.') + 1);
+    let data = {
+      listId: this.list.listId,
+      index: taskNumber
     }
-    tasks.splice(tempTaskNumber, 1);
+    this.listService.removeTask(data).subscribe(
+      (apiResponse) => {
+        console.log(apiResponse);
+        if (apiResponse.status === 200) {
+          let tempTaskNumber = taskNumber;
+          let tasks = this.list.tasks;
+          let task;
+
+          while (tempTaskNumber.indexOf('.') != -1) {
+            task = tasks[parseInt(tempTaskNumber.substring(0, tempTaskNumber.indexOf('.')))];
+            tasks = task.subTasks;
+            tempTaskNumber = tempTaskNumber.substring(tempTaskNumber.indexOf('.') + 1);
+          }
+          tasks.splice(tempTaskNumber, 1);
+        }
+        else {
+          alert(apiResponse.message);
+        }
+      },
+      (err) => {
+        alert(err.error.message);
+      });
   }
   public addSubTask(event, taskNumber: string, text) {
     event.stopPropagation();
-    let tempTaskNumber = taskNumber;
-    let tasks = this.list.tasks;
-    let task;
-
-    while (tempTaskNumber.indexOf('.') != -1) {
-      task = tasks[parseInt(tempTaskNumber.substring(0, tempTaskNumber.indexOf('.')))];
-      tasks = task.subTasks;
-      tempTaskNumber = tempTaskNumber.substring(tempTaskNumber.indexOf('.') + 1);
+    let data = {
+      text: text.value,
+      listId: this.list.listId,
+      index: taskNumber
     }
-    task = tasks[tempTaskNumber];
-    let newSubTask = { text: text.value, subTasks: [], isOpen: true, createdOn: Date.now(), modifiedOn: Date.now() }
-    task.subTasks.push(newSubTask);
-    text.value = '';
+    this.listService.addTask(data).subscribe(
+      (apiResponse) => {
+        console.log(apiResponse);
+        if (apiResponse.status === 200) {
+          let tempTaskNumber = taskNumber;
+          let tasks = this.list.tasks;
+          let task;
+
+          while (tempTaskNumber.indexOf('.') != -1) {
+            task = tasks[parseInt(tempTaskNumber.substring(0, tempTaskNumber.indexOf('.')))];
+            tasks = task.subTasks;
+            tempTaskNumber = tempTaskNumber.substring(tempTaskNumber.indexOf('.') + 1);
+          }
+          task = tasks[parseInt(tempTaskNumber)];
+          console.log(task);
+
+          task.subTasks.push({ text: data.text, subTasks: [], isOpen: true, createdOn: Date.now(), modifiedOn: Date.now() });
+          text.value = '';
+        }
+        else {
+          alert(apiResponse.message);
+        }
+      },
+      (err) => {
+        alert(err.error.message);
+      });
   }
   public stopBubbling(event: MouseEvent) {
-    console.log("mousedown");
     event.stopPropagation();
   }
 }

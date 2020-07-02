@@ -10,7 +10,7 @@
                   Lists
                 </button>
                 <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLists">
-                    <button class="dropdown-item" type="button" *ngFor="let list of lists" (click)="selectList(list.listId)" [ngClass]="{active:list.isActive}">{{list.name}} <fa-icon [icon]="faTimes" class="text-danger float-right" (click)="deleteList(list.listId)"></fa-icon></button>
+                    <button class="dropdown-item" type="button" *ngFor="let list of lists" (click)="selectList(list.listId)" [ngClass]="{active:list.isActive}">{{list.name}} <fa-icon [icon]="faTimes" class="text-danger float-right" (click)="deleteList($event,list.listId)"></fa-icon></button>
                     <div class="input-group">
                         <input type="text" class="form-control" #newListName>
                         <div class="input-group-append">

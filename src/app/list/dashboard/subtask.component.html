@@ -5,8 +5,8 @@
             <fa-icon [icon]="faCheckSquare" class="mr-2 done"></fa-icon>
             <span class="text">{{task.text}}</span>
         </span>
-        <fa-icon [icon]="faTimes" class="text-danger float-right" (click)="removeTask($event,taskCounter+i)"></fa-icon>
-        <div class="input-group">
+        <fa-icon *ngIf="!search" [icon]="faTimes" class="text-danger float-right" (click)="removeTask($event,taskCounter+i)"></fa-icon>
+        <div class="input-group" *ngIf="!search">
             <input type="text" class="form-control" placeholder="Enter sub task" #ref>
             <div class="input-group-append">
                 <span class="input-group-text" (click)="addSubTask($event,taskCounter+i,ref)"><fa-icon [icon]="faPlus"></fa-icon></span>

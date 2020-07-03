@@ -43,7 +43,19 @@ export class DashboardComponent implements OnInit {
               return;
             for (let list of this.lists) {
               if (list.isActive) {
-                this.selectList(list.listId);
+                this.listService.getList({ listId: list.listId }).subscribe(
+                  (apiResponse) => {
+                    console.log(apiResponse);
+                    if (apiResponse.status === 200) {
+                      this.list = apiResponse.data;
+                    }
+                    else {
+                      alert(apiResponse.message);
+                    }
+                  },
+                  (err) => {
+                    alert(err.error.message);
+                  });
                 break;
               }
             }
@@ -75,6 +87,7 @@ export class DashboardComponent implements OnInit {
             this.lists = Array();
           this.lists.push(list);
           listName.value = '';
+          this.selectList(list.listId);
         }
         else {
           alert(apiResponse.message);
@@ -141,6 +154,8 @@ export class DashboardComponent implements OnInit {
   }
 
   public addTask() {
+    if (!this.search)
+      return;
     let data = {
       text: this.search,
       listId: this.list.listId,

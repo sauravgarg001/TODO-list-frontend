@@ -112,6 +112,8 @@ export class SubtaskComponent {
   }
   public addSubTask(event, taskNumber: string, text) {
     event.stopPropagation();
+    if (!text.value)
+      return;
     let data = {
       text: text.value,
       listId: this.list.listId,

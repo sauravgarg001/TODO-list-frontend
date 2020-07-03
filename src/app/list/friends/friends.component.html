@@ -1,0 +1,91 @@
+<div class="container-fluid p-0">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarTogglerDemo03" aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarTogglerDemo03">
+            <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+                <li class="nav-item">
+                    <a class="nav-link" [routerLink]="['/dashboard']">Home</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" [routerLink]="['/friends']">Friends<span class="sr-only">(current)</span></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="jumbotron jumbotron-fluid">
+        <div class="container">
+            <h1 class="display-4 text-center">
+                <span>Friends List</span>
+            </h1>
+            <div class="form-row mb-3 mt-5" *ngIf="users">
+                <div class="col-12">
+                    <input type="search" name="searchUser" class="form-control form-control-sm" [(ngModel)]="searchUser" placeholder="Find friends">
+                </div>
+                <div class="col-12">
+                    <div class="list-group">
+                        <div class="list-group-item list-group-item-action" *ngFor="let user of users | filter:searchUser; let i = index" [attr.data-index]="i">
+                            <span class="text">{{user.firstName}} {{user.lastName}}</span>
+                            <span *ngIf="!user.noRequest" class="float-right" (click)="sendFriendRequest(user.email)">
+                                <fa-icon [icon]="faPlus"></fa-icon>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row mb-3 mt-5">
+                <div class="col-md-6" *ngIf="friends">
+                    <div class="form-row">
+                        <div class="col-12">
+                            Friends
+                        </div>
+                        <div class="col-12">
+                            <input type="search" name="searchFriend" class="form-control form-control-sm" [(ngModel)]="searchFriend" placeholder="Search friends">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-12">
+                            <div class="list-group">
+                                <div class="list-group-item list-group-item-action" *ngFor="let friend of friends | filterFriends:searchFriend; let i = index" [attr.data-index]="i">
+                                    <span class="text">{{friend.user_id.firstName}} {{friend.user_id.lastName}}</span>
+                                    <span class="float-right" (click)="removeFriend(friend.user_id.email)">
+                                        <fa-icon [icon]="faTimesCircle" class="text-danger" style="font-size: 1.5rem;"></fa-icon>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6" *ngIf="friendRequests">
+                    <div class="form-row">
+                        <div class="col-12">
+                            Friend Requets
+                        </div>
+                        <div class="col-12">
+                            <input type="search" name="searchFriendRequest" class="form-control form-control-sm" [(ngModel)]="searchFriendRequest" placeholder="Search friend requests">
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="col-12">
+                            <div class="list-group">
+                                <div class="list-group-item list-group-item-action" *ngFor="let friendRequest of friendRequests | filterFriends:searchFriendRequest; let i = index" [attr.data-index]="i">
+                                    <span (click)="acceptFriendRequest(friendRequest.user_id.email)">
+                                        <fa-icon [icon]="faCheckCircle" class="text-primary" style="font-size: 1.5rem;"></fa-icon>
+                                    </span>
+                                    <span (click)="declineFriendRequest(friendRequest.user_id.email)">
+                                        <fa-icon [icon]="faTimesCircle" class="text-danger" style="font-size: 1.5rem;"></fa-icon>
+                                    </span>
+                                    <span class=" ml-4 align-top" style="font-size: 1.2rem;">{{friendRequest.user_id.firstName}} {{friendRequest.user_id.lastName}}</span>
+                                    <small class="float-right text-muted">{{friendRequest.createdOn |  date:'h:mm a, d MMM y' }}</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

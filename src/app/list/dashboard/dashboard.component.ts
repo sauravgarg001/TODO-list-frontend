@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Cookie } from 'ng2-cookies/ng2-cookies';
 import { AppService } from 'src/app/app.service';
 import { Router } from '@angular/router';
-import { faCheckSquare, faSquare, faTimes, faPlus, faShareSquare, faShare, faEye, faPen, faMinus, faRemoveFormat } from '@fortawesome/free-solid-svg-icons';
+import { faCheckSquare, faSquare, faTimes, faPlus, faShareSquare, faShare, faEye, faPen, faMinus, faRemoveFormat, faUndo } from '@fortawesome/free-solid-svg-icons';
 import { SocketService } from 'src/app/socket.service';
 import { ListService } from '../list.service';
 
@@ -24,6 +24,7 @@ export class DashboardComponent implements OnInit {
   public faMinus = faMinus;
   public faPen = faPen;
   public faRemoveFormat = faRemoveFormat;
+  public faUndo = faUndo;
 
   private authToken: string;
   private userId: string;
@@ -383,6 +384,27 @@ export class DashboardComponent implements OnInit {
               break;
             }
           }
+        }
+        else {
+          alert(apiResponse.message);
+        }
+      },
+      (err) => {
+        alert(err.error.message);
+      });
+  }
+
+  public undoChanges() {
+    if (!this.list)
+      return;
+    let data = {
+      listId: this.list.listId
+    }
+    this.listService.undo(data).subscribe(
+      (apiResponse) => {
+        console.log(apiResponse);
+        if (apiResponse.status === 200) {
+          this.list.tasks = apiResponse.data;
         }
         else {
           alert(apiResponse.message);

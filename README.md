@@ -30,3 +30,4 @@ To get more help on the Angular CLI use `ng help` or go check out the [Angular C
 
 Font Awesome 5: https://github.com/FortAwesome/angular-fontawesome
 Get child node index: https://stackoverflow.com/questions/5913927/get-child-node-index
+Mixed Schema Type: https://mongoosejs.com/docs/2.7.x/docs/schematypes.html

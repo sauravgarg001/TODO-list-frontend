@@ -118,4 +118,11 @@ export class ListService {
       .set('email', data.email);
     return this.http.put(`${this.url}/contributers/access/read`, params);
   }
+
+  public undo(data): Observable<any> {
+    const params = new HttpParams()
+      .set('authToken', Cookie.get('authToken'))
+      .set('listId', data.listId);
+    return this.http.put(`${this.url}/undo`, params);
+  }
 }

@@ -83,12 +83,17 @@
                 </div>
             </div>
             <div class="form-row mb-3 mt-5" *ngIf="list">
-                <div class="col-md-10">
-                    <input type="search" name="search" class="form-control form-control-sm" [(ngModel)]="search" placeholder="Search">
+                <div class="col-md-8">
+                    <input type="search" name="search" class="form-control form-control-sm" [(ngModel)]="search" placeholder="Search or add new task">
                 </div>
                 <div class="col-md-2">
                     <button type="button" style="cursor: pointer;" class="form-control form-control-sm btn-block btn-dark btn-sm" (click)="addTask()" *ngIf="list.canEdit">
-                        <fa-icon [icon]="faPlus" class="mr-2"></fa-icon>Add new Task
+                        <fa-icon [icon]="faPlus" class="mr-2"></fa-icon>Add Task
+                    </button>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" style="cursor: pointer;" class="form-control form-control-sm btn-block btn-danger btn-sm" (click)="undoChanges()" *ngIf="list.canEdit">
+                        <fa-icon [icon]="faUndo" class="mr-2"></fa-icon>Undo
                     </button>
                 </div>
             </div>

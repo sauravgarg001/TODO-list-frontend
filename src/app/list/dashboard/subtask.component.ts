@@ -26,6 +26,10 @@ export class SubtaskComponent {
   constructor(public appService: AppService, public listService: ListService, public sockerService: SocketService, public router: Router) { }
 
   public toggleTaskStatus(event, taskNumber: string) {
+    if (!this.list.canEdit) {
+      alert('Only Read Access');
+      return;
+    }
     if (this.search) {
       alert("Clear search first!");
       return;

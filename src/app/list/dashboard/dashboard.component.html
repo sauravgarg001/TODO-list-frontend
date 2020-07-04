@@ -21,16 +21,63 @@
                 <span *ngIf="list">{{list.name}}</span>
                 <span *ngIf="!list">TODO List</span>
             </h1>
-            <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle btn-block" type="button" id="dropdownMenuLists" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                  Lists
-                </button>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLists">
-                    <button class="dropdown-item" type="button" *ngFor="let list of lists" (click)="selectList(list.listId)" [ngClass]="{active:list.isActive}">{{list.name}} <fa-icon [icon]="faTimes" class="text-danger float-right" (click)="deleteList($event,list.listId)"></fa-icon></button>
-                    <div class="input-group">
-                        <input type="text" class="form-control" #newListName>
-                        <div class="input-group-append">
-                            <button type="button" class="form-control btn-block btn-secondary input-group-text" (click)="createList(newListName)">Create new List</button>
+            <div class="form-row mb-3 mt-5">
+                <div class="col-md-10">
+                    <div class="dropdown">
+                        <button class="btn btn-dark dropdown-toggle btn-block" type="button" id="dropdownMenuLists" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        Lists
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuLists">
+                            <button class="dropdown-item" type="button" *ngFor="let list of lists" (click)="selectList(list.listId)" [ngClass]="{active:list.isActive}">{{list.name}} <fa-icon style="cursor: pointer;" [icon]="faTimes" class="text-danger float-right" (click)="deleteList($event,list.listId)"></fa-icon></button>
+                            <div class="input-group">
+                                <input type="text" class="form-control" #newListName>
+                                <div class="input-group-append">
+                                    <button type="button" class="form-control btn-block btn-secondary input-group-text" (click)="createList(newListName)">Create new List</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-2" *ngIf="list">
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle btn-block" type="button" id="dropdownMenuLists2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <fa-icon [icon]="faShareSquare" class="mr-2"></fa-icon>Share
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuLists2">
+                            <div class="form-row">
+                                <div class="col-12">
+                                    <input type="search" name="searchFriend" class="form-control form-control-sm" [(ngModel)]="searchFriend" placeholder="Search friends">
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="col-12">
+                                    <div class="list-group">
+                                        <div class="list-group-item" *ngFor="let contributer of list.contributers | filterFriends:searchFriend; let i = index" [attr.data-index]="i">
+                                            <span class="text">{{contributer.user_id.firstName}} {{contributer.user_id.lastName}}</span>
+                                            <span class="float-right" *ngIf="!contributer.isSelf && list.isOwner">
+                                                <fa-icon style="cursor: pointer;" [icon]="faEye" (click)="addToContributor(contributer.user_id.email, false)" data-toggle="tooltip" data-placement="top" title="Make viewer" *ngIf="contributer.isFriend"></fa-icon>
+
+                                                <fa-icon style="cursor: pointer;" [icon]="faPen" (click)="addToContributor(contributer.user_id.email, true)" data-toggle="tooltip" data-placement="top" title="Make editor" *ngIf="contributer.isFriend"></fa-icon>
+
+                                                <fa-icon style="cursor: pointer;" [icon]="faPen" (click)="grantAccessToEdit(contributer.user_id.email)" data-toggle="tooltip" data-placement="top" title="Make editor" *ngIf="!contributer.canEdit && !contributer.isFriend"></fa-icon>
+
+                                                <fa-icon style="cursor: pointer;" [icon]="faRemoveFormat" (click)="grantAccessToRead(contributer.user_id.email)" data-toggle="tooltip" data-placement="top" title="Make viewer only" *ngIf="contributer.canEdit"></fa-icon>
+
+                                                <fa-icon style="cursor: pointer;" [icon]="faMinus" (click)="removeFromContributor(contributer.user_id.email)" data-toggle="tooltip" data-placement="top" title="Remove from contributers" *ngIf="!contributer.isFriend"></fa-icon>
+                                            </span>
+                                            <small class="float-right text-muted" *ngIf="contributer.isOwner">
+                                                Owner
+                                            </small>
+                                            <small class="float-right text-muted" *ngIf="!contributer.isOwner &&contributer.canEdit">
+                                                Editor
+                                            </small>
+                                            <small class="float-right text-muted" *ngIf="!contributer.canEdit &&!contributer.isFriend">
+                                                Viewer
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -40,7 +87,7 @@
                     <input type="search" name="search" class="form-control form-control-sm" [(ngModel)]="search" placeholder="Search">
                 </div>
                 <div class="col-md-2">
-                    <button type="button" class="form-control form-control-sm btn-block btn-dark btn-sm" (click)="addTask()">
+                    <button type="button" style="cursor: pointer;" class="form-control form-control-sm btn-block btn-dark btn-sm" (click)="addTask()" *ngIf="list.canEdit">
                         <fa-icon [icon]="faPlus" class="mr-2"></fa-icon>Add new Task
                     </button>
                 </div>

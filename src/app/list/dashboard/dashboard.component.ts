@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Cookie } from 'ng2-cookies/ng2-cookies';
 import { AppService } from 'src/app/app.service';
 import { Router } from '@angular/router';
-import { faCheckSquare, faSquare, faTimes, faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faCheckSquare, faSquare, faTimes, faPlus, faShareSquare, faShare, faEye, faPen, faMinus, faRemoveFormat } from '@fortawesome/free-solid-svg-icons';
 import { SocketService } from 'src/app/socket.service';
 import { ListService } from '../list.service';
 
@@ -18,12 +18,20 @@ export class DashboardComponent implements OnInit {
   public faSquare = faSquare;
   public faTimes = faTimes;
   public faPlus = faPlus;
+  public faShareSquare = faShareSquare;
+  public faShare = faShare;
+  public faEye = faEye;
+  public faMinus = faMinus;
+  public faPen = faPen;
+  public faRemoveFormat = faRemoveFormat;
 
   private authToken: string;
   private userId: string;
   public search: string;
+  public searchFriend: string;
   public lists;
   public list;
+  private friends;
 
   constructor(public appService: AppService, public listService: ListService, public sockerService: SocketService, public router: Router) { }
 
@@ -34,39 +42,113 @@ export class DashboardComponent implements OnInit {
       this.router.navigate(['/login']);
     else {
       //verify user
-      this.listService.getLists().subscribe(
-        (apiResponse) => {
-          console.log(apiResponse);
-          if (apiResponse.status === 200) {
-            this.lists = apiResponse.data;
-            if (!this.lists)
-              return;
-            for (let list of this.lists) {
-              if (list.isActive) {
-                this.listService.getList({ listId: list.listId }).subscribe(
-                  (apiResponse) => {
-                    console.log(apiResponse);
-                    if (apiResponse.status === 200) {
-                      this.list = apiResponse.data;
-                    }
-                    else {
-                      alert(apiResponse.message);
-                    }
-                  },
-                  (err) => {
-                    alert(err.error.message);
-                  });
-                break;
+
+      let getLists = () => {
+        return new Promise((resolve, reject) => {
+          this.listService.getLists().subscribe(
+            (apiResponse) => {
+              console.log(apiResponse);
+              if (apiResponse.status === 200) {
+                this.lists = apiResponse.data;
+                resolve();
               }
+              else {
+                reject(apiResponse.message);
+              }
+            },
+            (err) => {
+              reject(err.error.message);
+            });
+        });
+      }
+
+      let getFriends = () => {
+        return new Promise((resolve, reject) => {
+          this.appService.getUser().subscribe(
+            (apiResponse) => {
+              console.log(apiResponse);
+              if (apiResponse.status === 200) {
+                let user = apiResponse.data;
+                this.friends = user.friends;
+                resolve();
+              }
+              else {
+                reject(apiResponse.message);
+              }
+            },
+            (err) => {
+              reject(err.error.message);
+            });
+
+        });
+      }
+
+      let getList = () => {
+        return new Promise((resolve, reject) => {
+          if (!this.lists)
+            return;
+          for (let list of this.lists) {
+            if (list.isActive) {
+              this.listService.getList({ listId: list.listId }).subscribe(
+                (apiResponse) => {
+                  if (apiResponse.status === 200) {
+                    this.list = apiResponse.data;
+                    let selfFlag = true;
+                    let totalContributers = this.list.contributers.length;
+
+                    for (let i = 0; i < this.friends.length; i++) {
+                      let flag = true;
+                      for (let j = 0; j < totalContributers; j++) {
+                        if (this.list.contributers[j].user_id.userId == this.userId && selfFlag) {
+                          this.list.contributers[j].isSelf = true;
+                          this.list.canEdit = this.list.contributers[j].canEdit;
+                          if (this.list.contributers[j].isOwner)
+                            this.list.isOwner = true;
+                          else
+                            this.list.isOwner = false;
+                          selfFlag = false;
+                        }
+                        else if (this.list.contributers[j].user_id.email == this.friends[i].user_id.email) {
+                          flag = false;
+                          if (!selfFlag)
+                            break;
+                        }
+                      }
+                      if (flag) {
+                        this.list.contributers.push({
+                          isFriend: true,
+                          user_id: {
+                            email: this.friends[i].user_id.email,
+                            firstName: this.friends[i].user_id.firstName,
+                            lastName: this.friends[i].user_id.lastName,
+                          }
+                        });
+                      }
+                    }
+                    resolve('Initialization Done');
+                  }
+                  else {
+                    reject(apiResponse.message);
+                  }
+                },
+                (err) => {
+                  reject(err.error.message);
+                });
+              break;
             }
           }
-          else {
-            alert(apiResponse.message);
-          }
-        },
-        (err) => {
-          alert(err.error.message);
         });
+      }
+
+      getLists()
+        .then(getFriends)
+        .then(getList)
+        .then(msg => {
+          console.info(msg);
+        })
+        .catch(err => {
+          alert(err);
+        })
     }
   }
 
@@ -134,8 +216,38 @@ export class DashboardComponent implements OnInit {
     this.listService.markListAsActive(data).subscribe(
       (apiResponse) => {
         console.log(apiResponse);
-        this.list = apiResponse.data;
         if (apiResponse.status === 200) {
+          this.list = apiResponse.data;
+          let selfFlag = true;
+          for (let i = 0; i < this.friends.length; i++) {
+            let flag = true;
+            for (let j = 0; j < this.list.contributers.length; j++) {
+              if (this.list.contributers[j].user_id.userId == this.userId && selfFlag) {
+                this.list.contributers[j].isSelf = true;
+                this.list.canEdit = this.list.contributers[j].canEdit;
+                if (this.list.contributers[j].isOwner)
+                  this.list.isOwner = true;
+                else
+                  this.list.isOwner = false;
+                selfFlag = false;
+              }
+              else if (this.list.contributers[j].user_id.email == this.friends[i].user_id.email) {
+                flag = false;
+                break;
+              }
+            }
+            if (flag) {
+              this.list.contributers.push({
+                isFriend: true,
+                user_id: {
+                  email: this.friends[i].user_id.email,
+                  firstName: this.friends[i].user_id.firstName,
+                  lastName: this.friends[i].user_id.lastName,
+                }
+              });
+            }
+          }
+          //change active list
           for (let i = 0; i < this.lists.length; i++) {
             if (this.lists[i].listId == listId) {
               this.lists[i].isActive = true;
@@ -177,5 +289,107 @@ export class DashboardComponent implements OnInit {
       });
   }
 
+  public addToContributor(email, canEdit) {
+    let data = {
+      email: email,
+      canEdit: canEdit,
+      listId: this.list.listId,
+      name: this.list.name
+    }
+    this.listService.addContributor(data).subscribe(
+      (apiResponse) => {
+        console.log(apiResponse);
+        if (apiResponse.status === 200) {
+          for (let i = 0; i < this.list.contributers.length; i++) {
+            if (this.list.contributers[i].user_id.email == email) {
+              delete this.list.contributers[i].isFriend;
+              this.list.contributers[i].canEdit = canEdit;
+              break;
+            }
+          }
+        }
+        else {
+          alert(apiResponse.message);
+        }
+      },
+      (err) => {
+        alert(err.error.message);
+      });
+  }
 
+  public removeFromContributor(email) {
+    let data = {
+      email: email,
+      listId: this.list.listId
+    }
+    this.listService.removeContributor(data).subscribe(
+      (apiResponse) => {
+        console.log(apiResponse);
+        if (apiResponse.status === 200) {
+          for (let i = 0; i < this.list.contributers.length; i++) {
+            if (this.list.contributers[i].user_id.email == email) {
+              this.list.contributers[i].isFriend = true;
+              delete this.list.contributers[i].canEdit;
+              break;
+            }
+          }
+        }
+        else {
+          alert(apiResponse.message);
+        }
+      },
+      (err) => {
+        alert(err.error.message);
+      });
+  }
+
+  public grantAccessToEdit(email) {
+    let data = {
+      email: email,
+      listId: this.list.listId
+    }
+    this.listService.grantAccessToEdit(data).subscribe(
+      (apiResponse) => {
+        console.log(apiResponse);
+        if (apiResponse.status === 200) {
+          for (let i = 0; i < this.list.contributers.length; i++) {
+            if (this.list.contributers[i].user_id.email == email) {
+              this.list.contributers[i].canEdit = true;
+              break;
+            }
+          }
+        }
+        else {
+          alert(apiResponse.message);
+        }
+      },
+      (err) => {
+        alert(err.error.message);
+      });
+  }
+
+  public grantAccessToRead(email) {
+    let data = {
+      email: email,
+      listId: this.list.listId
+    }
+    this.listService.grantAccessToRead(data).subscribe(
+      (apiResponse) => {
+        console.log(apiResponse);
+        if (apiResponse.status === 200) {
+          for (let i = 0; i < this.list.contributers.length; i++) {
+            if (this.list.contributers[i].user_id.email == email) {
+              this.list.contributers[i].canEdit = false;
+              break;
+            }
+          }
+        }
+        else {
+          alert(apiResponse.message);
+        }
+      },
+      (err) => {
+        alert(err.error.message);
+      });
+  }
 }

@@ -1,3 +1,8 @@
+.isDone,
+.isOpen {
+    cursor: pointer;
+}
+
 .isOpen>.open {
     display: unset;
 }

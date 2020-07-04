@@ -84,4 +84,38 @@ export class ListService {
       .set('index', data.index);
     return this.http.put(`${this.url}/task/mark/open`, params);
   }
+
+  public addContributor(data): Observable<any> {
+    const params = new HttpParams()
+      .set('authToken', Cookie.get('authToken'))
+      .set('email', data.email)
+      .set('listId', data.listId)
+      .set('name', data.name)
+      .set('canEdit', data.canEdit);
+    return this.http.post(`${this.url}/contributers`, params);
+  }
+
+  public removeContributor(data): Observable<any> {
+    const params = new HttpParams()
+      .set('authToken', Cookie.get('authToken'))
+      .set('listId', data.listId)
+      .set('email', data.email);
+    return this.http.delete(`${this.url}/contributers`, { params: params });
+  }
+
+  public grantAccessToEdit(data): Observable<any> {
+    const params = new HttpParams()
+      .set('authToken', Cookie.get('authToken'))
+      .set('listId', data.listId)
+      .set('email', data.email);
+    return this.http.put(`${this.url}/contributers/access/edit`, params);
+  }
+
+  public grantAccessToRead(data): Observable<any> {
+    const params = new HttpParams()
+      .set('authToken', Cookie.get('authToken'))
+      .set('listId', data.listId)
+      .set('email', data.email);
+    return this.http.put(`${this.url}/contributers/access/read`, params);
+  }
 }

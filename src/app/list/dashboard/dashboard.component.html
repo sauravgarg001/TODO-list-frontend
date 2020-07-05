@@ -10,9 +10,12 @@
                     <a class="nav-link" [routerLink]="['/dashboard']">Home <span class="sr-only">(current)</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" [routerLink]="['/friends']">Friends</a>
+                    <a class="nav-link" (click)="goToFriends()">Friends</a>
                 </li>
             </ul>
+            <form class="form-inline my-2 my-lg-0">
+                <button class="btn btn-outline-danger my-2 my-sm-0" type="button" (click)="logout(null)">Logout</button>
+            </form>
         </div>
     </nav>
     <div class="jumbotron jumbotron-fluid">
@@ -53,6 +56,7 @@
                                 <div class="col-12">
                                     <div class="list-group">
                                         <div class="list-group-item" *ngFor="let contributer of list.contributers | filterFriends:searchFriend; let i = index" [attr.data-index]="i">
+                                            <fa-icon [icon]="faCircle" class="text-success" data-toggle="tooltip" data-placement="top" title="Online" *ngIf="contributer.isOnline"></fa-icon>
                                             <span class="text">{{contributer.user_id.firstName}} {{contributer.user_id.lastName}}</span>
                                             <span class="float-right" *ngIf="!contributer.isSelf && list.isOwner">
                                                 <fa-icon style="cursor: pointer;" [icon]="faEye" (click)="addToContributor(contributer.user_id.email, false)" data-toggle="tooltip" data-placement="top" title="Make viewer" *ngIf="contributer.isFriend"></fa-icon>
@@ -84,7 +88,7 @@
             </div>
             <div class="form-row mb-3 mt-5" *ngIf="list">
                 <div class="col-md-8">
-                    <input type="search" name="search" class="form-control form-control-sm" [(ngModel)]="search" placeholder="Search or add new task">
+                    <input type="search" name="search" class="form-control form-control-sm" [(ngModel)]="search" placeholder="Search or add new task" (keyup.enter)="addTask()">
                 </div>
                 <div class="col-md-2">
                     <button type="button" style="cursor: pointer;" class="form-control form-control-sm btn-block btn-dark btn-sm" (click)="addTask()" *ngIf="list.canEdit">
@@ -99,7 +103,7 @@
             </div>
             <div class="form-row" *ngIf="list">
                 <div class="col" id="todo-list">
-                    <subtask [search]="search" [taskCounter]="''" [list]="list" [tasks]="list.tasks"></subtask>
+                    <subtask [search]="search" [taskCounter]="''" [list]="list" [tasks]="list.tasks" [email]="email"></subtask>
                 </div>
             </div>
         </div>

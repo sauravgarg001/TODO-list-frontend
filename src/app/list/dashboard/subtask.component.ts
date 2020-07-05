@@ -16,6 +16,7 @@ export class SubtaskComponent {
   @Input() tasks;
   @Input() search: string;
   @Input() taskCounter;
+  @Input() email;
 
   //Font Awesome Icons
   public faCheckSquare = faCheckSquare;
@@ -23,7 +24,7 @@ export class SubtaskComponent {
   public faTimes = faTimes;
   public faPlus = faPlus;
 
-  constructor(public appService: AppService, public listService: ListService, public sockerService: SocketService, public router: Router) { }
+  constructor(public appService: AppService, public listService: ListService, public socketService: SocketService, public router: Router) { }
 
   public toggleTaskStatus(event, taskNumber: string) {
     if (!this.list.canEdit) {
@@ -56,6 +57,17 @@ export class SubtaskComponent {
           console.log(apiResponse);
           if (apiResponse.status === 200) {
             task.isOpen = false;
+            //RTC
+            for (let i = 0; i < this.list.contributers.length; i++) {
+              if (this.list.contributers[i].user_id.email != this.email && !this.list.contributers[i].isFriend) {
+                this.socketService.setUpdates({
+                  eventName: 'tasks',
+                  listId: this.list.listId,
+                  email: this.list.contributers[i].user_id.email,
+                  tasks: this.list.tasks
+                });
+              }
+            }
           }
           else {
             alert(apiResponse.message);
@@ -74,6 +86,17 @@ export class SubtaskComponent {
           console.log(apiResponse);
           if (apiResponse.status === 200) {
             task.isOpen = true;
+            //RTC
+            for (let i = 0; i < this.list.contributers.length; i++) {
+              if (this.list.contributers[i].user_id.email != this.email && !this.list.contributers[i].isFriend) {
+                this.socketService.setUpdates({
+                  eventName: 'tasks',
+                  listId: this.list.listId,
+                  email: this.list.contributers[i].user_id.email,
+                  tasks: this.list.tasks
+                });
+              }
+            }
           }
           else {
             alert(apiResponse.message);
@@ -105,6 +128,17 @@ export class SubtaskComponent {
             tempTaskNumber = tempTaskNumber.substring(tempTaskNumber.indexOf('.') + 1);
           }
           tasks.splice(tempTaskNumber, 1);
+          //RTC
+          for (let i = 0; i < this.list.contributers.length; i++) {
+            if (this.list.contributers[i].user_id.email != this.email && !this.list.contributers[i].isFriend) {
+              this.socketService.setUpdates({
+                eventName: 'tasks',
+                listId: this.list.listId,
+                email: this.list.contributers[i].user_id.email,
+                tasks: this.list.tasks
+              });
+            }
+          }
         }
         else {
           alert(apiResponse.message);
@@ -141,6 +175,17 @@ export class SubtaskComponent {
 
           task.subTasks.push({ text: data.text, subTasks: [], isOpen: true, createdOn: Date.now(), modifiedOn: Date.now() });
           text.value = '';
+          //RTC
+          for (let i = 0; i < this.list.contributers.length; i++) {
+            if (this.list.contributers[i].user_id.email != this.email && !this.list.contributers[i].isFriend) {
+              this.socketService.setUpdates({
+                eventName: 'tasks',
+                listId: this.list.listId,
+                email: this.list.contributers[i].user_id.email,
+                tasks: this.list.tasks
+              });
+            }
+          }
         }
         else {
           alert(apiResponse.message);

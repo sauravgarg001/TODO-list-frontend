@@ -7,11 +7,11 @@
         </span>
         <fa-icon *ngIf="!search && list.canEdit" [icon]="faTimes" style="cursor: pointer;" class="text-danger float-right" (click)="removeTask($event,taskCounter+i)"></fa-icon>
         <div class="input-group" *ngIf="!search && list.canEdit">
-            <input type="text" class="form-control" placeholder="Enter sub task" #ref>
+            <input type="text" class="form-control" placeholder="Enter sub task" #ref (keyup.enter)="addSubTask($event,taskCounter+i,ref)">
             <div class="input-group-append">
                 <span class="input-group-text" style="cursor: pointer;" (click)="addSubTask($event,taskCounter+i,ref)"><fa-icon [icon]="faPlus"></fa-icon></span>
             </div>
         </div>
-        <subtask *ngIf="task.subTasks" [search]="search " [list]="list " [taskCounter]="taskCounter+i+ '.' " [tasks]="task.subTasks "></subtask>
+        <subtask *ngIf="task.subTasks" [search]="search" [list]="list" [taskCounter]="taskCounter+i+ '.' " [tasks]="task.subTasks" [email]="email"></subtask>
     </div>
 </div>

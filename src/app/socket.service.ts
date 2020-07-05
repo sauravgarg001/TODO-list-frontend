@@ -28,14 +28,27 @@ export class SocketService {
       });
   }
 
-  public onlineUserList() {
-    return Observable.create(
-      (observer) => {
-        this.socket.on('online-user-list',
-          (userList) => {
-            observer.next(userList);
-          });
+  public setUser() {
+    let data = {
+      userId: Cookie.get('userId'),
+      authToken: Cookie.get('authToken')
+    }
+    this.socket.emit('set-user', data);
+  }
+
+  public setUpdates(data) {
+    data.userId = Cookie.get('userId');
+    let eventName = data.eventName;
+    delete data.eventName;
+    this.socket.emit(eventName, data);
+  }
+
+  public authError() {
+    return Observable.create((observer) => {
+      this.socket.on('auth-error@' + Cookie.get('authToken'), (data) => {
+        observer.next(data);
       });
+    });
   }
 
   public disconnectedSocket() {
@@ -48,35 +61,84 @@ export class SocketService {
       });
   }
 
-  public setUser(authToken) {
-    this.socket.emit("set-user", authToken);
-  }
-
-  public markChatAsSeen(userDetails) {
-    this.socket.emit('mark-chat-as-seen', userDetails);
-  }
-
-  public getChat(senderId, receiverId, skip): Observable<any> {
-    return this.http
-      .get(`${this.baseUrl}/api/v1/chat/get/for/user?senderId=${senderId}&receiverId=${receiverId}&skip=${skip}&authToken=${Cookie.get('authtoken')}`)
-      .pipe(
-        tap(
-          data => console.log('Data Received'),
-          error => this.handleError
-        )
-      );
-  }
-
-  public chatByUserId(userId) {
+  public getOnlineUsers() {
     return Observable.create((observer) => {
-      this.socket.on(userId, (data) => {
+      this.socket.on('online-users', (data) => {
         observer.next(data);
       });
     });
   }
 
-  public sendChatMessage(ChatMsgObject) {
-    this.socket.emit('chat-msg', ChatMsgObject);
+  public getAddedOnlineUser() {
+    return Observable.create((observer) => {
+      this.socket.on('online-user-add@' + Cookie.get('authToken'), (data) => {
+        observer.next(data);
+      });
+    });
+  }
+
+  public getRemovedOnlineUser() {
+    return Observable.create((observer) => {
+      this.socket.on('online-user-remove@' + Cookie.get('authToken'), (data) => {
+        observer.next(data);
+      });
+    });
+  }
+
+  public getUpdatedTasks() {
+    return Observable.create((observer) => {
+      this.socket.on('tasks@' + Cookie.get('authToken'), (data) => {
+        observer.next(data);
+      });
+    });
+  }
+
+  public getAddedContributer() {
+    return Observable.create((observer) => {
+      this.socket.on('add-contributer@' + Cookie.get('authToken'), (data) => {
+        observer.next(data);
+      });
+    });
+  }
+
+  public getRemovedContributer() {
+    return Observable.create((observer) => {
+      this.socket.on('remove-contributer@' + Cookie.get('authToken'), (data) => {
+        observer.next(data);
+      });
+    });
+  }
+
+  public getChangedAccessContributer() {
+    return Observable.create((observer) => {
+      this.socket.on('change-contributer@' + Cookie.get('authToken'), (data) => {
+        observer.next(data);
+      });
+    });
+  }
+
+  public getAddedFriend() {
+    return Observable.create((observer) => {
+      this.socket.on('add-friend@' + Cookie.get('authToken'), (data) => {
+        observer.next(data);
+      });
+    });
+  }
+
+  public getFriendRequest() {
+    return Observable.create((observer) => {
+      this.socket.on('add-friend-request@' + Cookie.get('authToken'), (data) => {
+        observer.next(data);
+      });
+    });
+  }
+
+  public getRemovedFriend() {
+    return Observable.create((observer) => {
+      this.socket.on('remove-friend@' + Cookie.get('authToken'), (data) => {
+        observer.next(data);
+      });
+    });
   }
 
   public exitSocket() {

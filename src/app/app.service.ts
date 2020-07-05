@@ -22,7 +22,8 @@ export class AppService {
       .set('lastName', data.lastName)
       .set('mobileNumber', data.mobileNumber)
       .set('email', data.email)
-      .set('password', data.password);
+      .set('password', data.password)
+      .set('countryCode', data.countryCode);
 
     return this.http.post(`${this.url}/signup`, params);
   }
@@ -33,6 +34,22 @@ export class AppService {
       .set('password', data.password);
 
     return this.http.post(`${this.url}/login`, params);
+  }
+
+  public forgotPassword(data): Observable<any> {
+    const params = new HttpParams()
+      .set('email', data.email)
+
+    return this.http.post(`${this.url}/forgot/password`, params);
+  }
+
+  public changePassword(data): Observable<any> {
+    const params = new HttpParams()
+      .set('email', data.email)
+      .set('OTP', data.OTP)
+      .set('newPassword', data.newPassword);
+
+    return this.http.put(`${this.url}/change/password`, params);
   }
 
   public logout(): Observable<any> {
@@ -93,5 +110,9 @@ export class AppService {
 
   public setUserInfoInLocalStorage(data) {
     return localStorage.setItem('userInfo', JSON.stringify(data));
+  }
+
+  public getCountryCode(): Observable<any> {
+    return this.http.get(`http://country.io/phone.json`);
   }
 }

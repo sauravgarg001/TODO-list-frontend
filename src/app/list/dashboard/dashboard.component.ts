@@ -723,7 +723,7 @@ export class DashboardComponent implements OnInit {
   }
 
   public undoChanges() {
-    if (!this.list)
+    if (!this.list || !this.list.canEdit)
       return;
     let data = {
       listId: this.list.listId

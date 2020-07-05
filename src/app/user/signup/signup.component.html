@@ -42,7 +42,17 @@
                 <!-- .form-row ends -->
                 <!-- .form-row starts -->
                 <div class=" form-row">
-                    <div class="col-md-12 mb-3">
+                    <div class="col-md-3 mb-3">
+                        <label for="countryCode" class="font-weight-bold">Country Code</label>
+                        <select class="form-control" id="countryCode" [class.is-invalid]="countryCode=='' && _countryCode.touched" [class.is-valid]="countryCode!=''" name="countryCode" [(ngModel)]="countryCode" #_countryCode="ngModel">
+                            <option value="" >Select</option>
+                            <option *ngFor="let code of codes" [value]="code" >{{code}}</option>
+                          </select>
+                        <div class="invalid-feedback">
+                            Select a country code?
+                        </div>
+                    </div>
+                    <div class="col-md-9 mb-3">
                         <label for="mobileNumber" class="font-weight-bold">Mobile number</label>
                         <input type="number" class="form-control" [class.is-invalid]="!validateMobile(mobileNumber) && !_mobileNumber.pristine" [class.is-valid]="validateMobile(mobileNumber)" id="mobileNumber" name="mobileNumber" [(ngModel)]="mobileNumber" placeholder="Mobile number"
                             #_mobileNumber="ngModel" required>

@@ -14,21 +14,33 @@ export class SignupComponent implements OnInit {
   public mobileNumber: string;
   public email: string;
   public password: string;
+  public countryCode: string = "";
+  private phones;
+  public codes;
 
   constructor(public appService: AppService, public router: Router) { }
 
   ngOnInit(): void {
+    this.appService.getCountryCode().subscribe(
+      (apiResponse) => {
+        this.phones = apiResponse;
+        this.codes = Object.keys(this.phones);
+      },
+      (err) => {
+        console.log(err.error.message);
+      });
   }
 
   public signup(): void {
+    let countryCode = this.phones[this.countryCode.trim()];
     let data = {
       firstName: this.firstName,
       lastName: this.lastName,
       mobileNumber: this.mobileNumber,
       email: this.email,
-      password: this.password
+      password: this.password,
+      countryCode: countryCode
     }
-
     this.appService.signup(data).subscribe(
       (apiResponse) => {
         console.log(apiResponse);
@@ -58,11 +70,17 @@ export class SignupComponent implements OnInit {
   }
 
   public validateMobile(mobileNumber: string): boolean {
-    let patt = /^[6-9]\d{9}$/;
-    if (patt.test(mobileNumber)) {
-      return true;
-    } else {
+    if (!this.countryCode || !mobileNumber)
       return false;
+    else if (this.countryCode == 'IN') {
+      let mobileNumberRegex = /^[6-9]\d{9}$/; /* 10 digits starts with 6-9 for India*/
+      if (mobileNumber.toString().match(mobileNumberRegex)) {
+        return true;
+      } else {
+        return false;
+      }
+    } else {
+      return true;
     }
   }
 

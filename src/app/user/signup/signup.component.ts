@@ -21,14 +21,14 @@ export class SignupComponent implements OnInit {
   constructor(public appService: AppService, public router: Router) { }
 
   ngOnInit(): void {
-    this.appService.getCountryCode().subscribe(
-      (apiResponse) => {
-        if (apiResponse)
-          this.phones = apiResponse;
-      },
-      (err) => {
-        console.log(err.error.message);
-      });
+    // this.appService.getCountryCode().subscribe(
+    //   (apiResponse) => {
+    //     if (apiResponse)
+    //       this.phones = apiResponse;
+    //   },
+    //   (err) => {
+    //     console.log(err.error.message);
+    //   });
     this.codes = Object.keys(this.phones);
   }
 

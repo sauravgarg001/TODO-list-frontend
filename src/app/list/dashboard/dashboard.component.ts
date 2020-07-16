@@ -107,6 +107,7 @@ export class DashboardComponent implements OnInit {
             if (list.isActive) {
               this.listService.getList({ listId: list.listId }).subscribe(
                 (apiResponse) => {
+                  console.log(apiResponse);
                   if (apiResponse.status === 200) {
                     this.list = apiResponse.data;
                     let selfFlag = true;
@@ -115,8 +116,9 @@ export class DashboardComponent implements OnInit {
                     for (let i = 0; i < this.friends.length; i++) {
                       let flag = true;
                       for (let j = 0; j < totalContributers; j++) {
-                        if (this.list.contributers[j].user_id.userId == this.userId && selfFlag) {
+                        if (this.list.contributers[j].user_id.email == this.email && selfFlag) {
                           this.list.contributers[j].isSelf = true;
+
                           this.list.canEdit = this.list.contributers[j].canEdit;
                           if (this.list.contributers[j].isOwner)
                             this.list.isOwner = true;
@@ -139,6 +141,18 @@ export class DashboardComponent implements OnInit {
                             lastName: this.friends[i].user_id.lastName,
                           }
                         });
+                      }
+                    }
+                    for (let j = 0; j < totalContributers && selfFlag; j++) {
+                      if (this.list.contributers[j].user_id.email == this.email && selfFlag) {
+                        this.list.contributers[j].isSelf = true;
+
+                        this.list.canEdit = this.list.contributers[j].canEdit;
+                        if (this.list.contributers[j].isOwner)
+                          this.list.isOwner = true;
+                        else
+                          this.list.isOwner = false;
+                        selfFlag = false;
                       }
                     }
                     resolve('Initialization Done');
@@ -434,7 +448,7 @@ export class DashboardComponent implements OnInit {
           for (let i = 0; i < this.friends.length; i++) {
             let flag = true;
             for (let j = 0; j < this.list.contributers.length; j++) {
-              if (this.list.contributers[j].user_id.userId == this.userId && selfFlag) {
+              if (this.list.contributers[j].user_id.email == this.email && selfFlag) {
                 this.list.contributers[j].isSelf = true;
                 this.list.canEdit = this.list.contributers[j].canEdit;
                 if (this.list.contributers[j].isOwner)
@@ -478,7 +492,7 @@ export class DashboardComponent implements OnInit {
   }
 
   public addTask() {
-    if (!this.search)
+    if (!this.search || !this.list.canEdit)
       return;
     let data = {
       text: this.search,
